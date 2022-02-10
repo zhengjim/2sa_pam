@@ -22,7 +22,7 @@ class Config:
     PIN_LIMIT = 3  # 限制错误尝试次数
 
     # tg通知
-    open_tg = True  # 是否开启
+    open_tg = False  # 是否开启
     tg_token = "xxx:xxx"  # tg token
     tg_chat_id = "xxxx"  # chai_id 发送人id
 
