@@ -14,10 +14,10 @@ if [ ! -f pam_python.so ]; then
 fi
 cp pam_python.so /usr/lib64/security/
 cd $(dirname $(dirname "$PWD"))
-cp pam_tg_auth.py /usr/lib64/security/pam_tg_auth.py
-chmod +x /usr/lib64/security/pam_tg_auth.py
+cp pam_notice_auth.py /usr/lib64/security/pam_notice_auth.py
+chmod +x /usr/lib64/security/pam_notice_auth.py
 sed -i 's#^ChallengeResponseAuthentication no#ChallengeResponseAuthentication yes#' /etc/ssh/sshd_config
-echo 'auth requisite pam_python.so /usr/lib64/security/pam_tg_auth.py' >> /etc/pam.d/sshd
+echo 'auth requisite pam_python.so /usr/lib64/security/pam_notice_auth.py' >> /etc/pam.d/sshd
 systemctl restart sshd
 
 echo "ok"

@@ -14,18 +14,35 @@ import platform
 import socket
 
 
+class Config:
+    """ 配置 """
+    EMERGENCY_HASH = "admin"  # 预定义万能验证码,务必修改！
+    PIN_LENGTH = 6  # PIN码长度
+    PIN_LIVE = 60  # PIN存活时间,超出时间验证失败
+    PIN_LIMIT = 3  # 限制错误尝试次数
+
+    # tg通知
+    open_tg = True  # 是否开启
+    tg_token = "xxx:xxx"  # tg token
+    tg_chat_id = "xxxx"  # chai_id 发送人id
+
+
 def auth_log(msg):
+    """记录日志
+
+    :param msg: 消息
+    :return:
+    """
     syslog.openlog(facility=syslog.LOG_AUTH)
     syslog.syslog("MultiFactors Authentication: " + msg)
     syslog.closelog()
 
 
 def action_tg(content):
-    host = "tgapi.xxx.workers.dev"
+    host = "api.telegram.org"
+    send_url = "/bot%s/sendMessage" % Config.tg_token
     headers = {'Content-Type': 'application/json'}
-    send_url = '/'
-    data = {"text": content}
-
+    data = {"chat_id": Config.tg_chat_id, "text": content}
     try:
         httpClient = httplib.HTTPSConnection(host, timeout=10)
         httpClient.request("POST", send_url, json.dumps(data), headers=headers)
@@ -68,18 +85,14 @@ def gen_key(pamh, user, length):
     hostip = socket.gethostbyname(platform.node())
     content = "[MFA] %s 使用 %s 正在登录 %s(%s), 验证码为【%s】, 1分钟内有效。" % (pamh.rhost, user, hostname, str(hostip), pin)
     auth_log(content)
-    result = action_tg(content)
+    if Config.open_tg:
+        action_tg(content)
 
     pin_time = datetime.datetime.now()
     return get_hash(pin), pin_time
 
 
 def pam_sm_authenticate(pamh, flags, argv):
-    PIN_LENGTH = 6  # PIN码长度
-    PIN_LIVE = 60  # PIN存活时间,超出时间验证失败
-    PIN_LIMIT = 3  # 限制错误尝试次数
-    EMERGENCY_HASH = "\xef\x8d\xd0\x1ahZ5'\x19>I8\xe3\x92\x80!C\x8a\x01\xe7\xcc\xc8\x89\n\xc3\x02\xd8q\xd0f\xf1\xb2!D\xaa\x8f{\xe9\\'\xa1N\xd6\x84$q\x87\xe1\xe4\x16\x0e\x9c\xce\xa8&\x8a\xf0\x852\xf6B\x7fS\x12"  # 预定义验证码123456的hash
-
     try:
         user = pamh.get_user()
     except pamh.exception as e:
@@ -94,19 +107,19 @@ def pam_sm_authenticate(pamh, flags, argv):
         pamh.conversation(msg)
         return pamh.PAM_ABORT
 
-    pin, pin_time = gen_key(pamh, user, PIN_LENGTH)
+    pin, pin_time = gen_key(pamh, user, Config.PIN_LENGTH)
 
-    for attempt in range(0, PIN_LIMIT):  # 限制错误尝试次数
+    for attempt in range(0, Config.PIN_LIMIT):  # 限制错误尝试次数
         msg = pamh.Message(pamh.PAM_PROMPT_ECHO_OFF, "Verification code:")
         resp = pamh.conversation(msg)
         resp_time = datetime.datetime.now()
         input_interval = resp_time - pin_time
-        if input_interval.seconds > PIN_LIVE:
+        if input_interval.seconds > Config.PIN_LIVE:
             msg = pamh.Message(pamh.PAM_ERROR_MSG, "[Warning] Time limit exceeded.")
             pamh.conversation(msg)
             return pamh.PAM_ABORT
         resp_hash = get_hash(resp.resp)
-        if resp_hash == pin or resp_hash == EMERGENCY_HASH:  # 用户输入与生成的验证码进行校验
+        if resp_hash == pin or resp_hash == get_hash(Config.EMERGENCY_HASH):  # 用户输入与生成的验证码进行校验
             return pamh.PAM_SUCCESS
         else:
             continue
