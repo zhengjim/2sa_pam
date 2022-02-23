@@ -28,6 +28,8 @@
 | open_tg  | 是否tg开启 默认不开启 |
 |tg_token|tg bot 的token|
 |tg_chat_id| tg 发送人id |
+| open_dingding  | 是否钉钉开启 默认不开启 |
+|dingding_token|钉钉机器人 的token|
 
 ## 安装
 

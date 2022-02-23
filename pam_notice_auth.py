@@ -26,6 +26,10 @@ class Config:
     tg_token = "xxx:xxx"  # tg token
     tg_chat_id = "xxxx"  # chai_id 发送人id
 
+    # 钉钉通知
+    open_dingding = True  # 是否开启
+    dingding_token = "xxxxxxxx"  # dingding token
+
 
 def auth_log(msg):
     """记录日志
@@ -62,6 +66,34 @@ def action_tg(content):
     return True
 
 
+def action_dingding(content):
+    host = "oapi.dingtalk.com"
+    send_url = "/robot/send?access_token=%s" % Config.dingding_token
+    headers = {'Content-Type': 'application/json'}
+    data = {
+        "msgtype": "text",
+        "text": {"content": content},
+        "isAtAll": True
+    }
+    try:
+        httpClient = httplib.HTTPSConnection(host, timeout=10)
+        httpClient.request("POST", send_url, json.dumps(data), headers=headers)
+        response = httpClient.getresponse()
+        result = json.loads(response.read())
+        if result['errmsg'] != "ok":
+            auth_log('Failed to send verification code using dingding: %s' % result)
+            return False
+    except Exception as e:
+        auth_log('Error sending verification code using dingding: %s' % e)
+        return False
+    finally:
+        if httpClient:
+            httpClient.close()
+
+    auth_log('Send verification code using dingding successfully.')
+    return True
+
+
 def get_user_comment(user):
     try:
         comments = pwd.getpwnam(user).pw_gecos
@@ -87,6 +119,8 @@ def gen_key(pamh, user, length):
     auth_log(content)
     if Config.open_tg:
         action_tg(content)
+    if Config.open_dingding:
+        action_dingding(content)
 
     pin_time = datetime.datetime.now()
     return get_hash(pin), pin_time
