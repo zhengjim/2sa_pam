@@ -1,6 +1,6 @@
 # 2sa_pam
 
-为centos系统加上pam两次验证，对接第三方通知
+为centos系统加上pam两次验证，对接第三方通知(钉钉、企业微信、tg)
 
 ![](./img/1.png)
 
