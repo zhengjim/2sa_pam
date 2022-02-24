@@ -25,11 +25,15 @@
 
 | 名字 | 说明 |
 |---  |---  |
-| open_tg  | 是否tg开启 默认不开启 |
+| open_tg  | 是否开启tg通知 默认不开启 |
 |tg_token|tg bot 的token|
 |tg_chat_id| tg 发送人id |
-| open_dingding  | 是否钉钉开启 默认不开启 |
+| open_dingding  | 是否开启钉钉通知 默认不开启 |
 |dingding_token|钉钉机器人 的token|
+| open_wechat  | 是否开启企业微信通知 默认不开启 |
+|wechat_corpid|企业微信CorpID|
+|wechat_secret|企业微信Secret|
+|wechat_agentid|企业微信AgentId|
 
 ## 安装
 

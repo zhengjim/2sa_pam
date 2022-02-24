@@ -24,11 +24,17 @@ class Config:
     # tg通知
     open_tg = False  # 是否开启
     tg_token = "xxx:xxx"  # tg token
-    tg_chat_id = "xxxx"  # chai_id 发送人id
+    tg_chat_id = "xxxxxx"  # chai_id 发送人id
 
     # 钉钉通知
-    open_dingding = True  # 是否开启
-    dingding_token = "xxxxxxxx"  # dingding token
+    open_dingding = False  # 是否开启
+    dingding_token = "xxxxxx"  # dingding token
+
+    # 企业微信通知
+    open_wechat = False  # 是否开启
+    wechat_corpid = "xxxxxx"  # 企业微信CorpID
+    wechat_secret = "xxxxxx"  # 企业微信Secret
+    wechat_agentid = 1000001  # 企业微信AgentId
 
 
 def auth_log(msg):
@@ -94,6 +100,58 @@ def action_dingding(content):
     return True
 
 
+def action_wechat(content):
+    host = "qyapi.weixin.qq.com"
+    send_url = "/cgi-bin/gettoken?corpid=%s&corpsecret=%s" % (Config.wechat_corpid, Config.wechat_secret)
+    try:
+        httpClient = httplib.HTTPSConnection(host, timeout=10)
+        httpClient.request("GET", send_url)
+        response = httpClient.getresponse()
+        result = json.loads(response.read())
+        if result['errmsg'] != "ok":
+            auth_log('Failed to send verification code using wechat: %s' % result)
+            return False
+        token = result['access_token']
+    except Exception as e:
+        auth_log('Error sending verification code using wechat: %s' % e)
+        return False
+    finally:
+        if httpClient:
+            httpClient.close()
+
+    if not token:
+        auth_log('Failed to send verification code using wechat: %s' % result)
+        return False
+
+    send_url = "/cgi-bin/message/send?access_token=%s" % token
+    headers = {'Content-Type': 'application/json'}
+    data = {
+        "touser": "@all",
+        "msgtype": "text",
+        "agentid": Config.wechat_agentid,
+        "text": {
+            "content": content
+        }
+    }
+    try:
+        httpClient = httplib.HTTPSConnection(host, timeout=10)
+        httpClient.request("POST", send_url, json.dumps(data), headers=headers)
+        response = httpClient.getresponse()
+        result = json.loads(response.read())
+        if result['errmsg'] != "ok":
+            auth_log('Failed to send verification code using wechat: %s' % result)
+            return False
+    except Exception as e:
+        auth_log('Error sending verification code using wechat: %s' % e)
+        return False
+    finally:
+        if httpClient:
+            httpClient.close()
+
+    auth_log('Send verification code using wechat successfully.')
+    return True
+
+
 def get_user_comment(user):
     try:
         comments = pwd.getpwnam(user).pw_gecos
@@ -121,6 +179,8 @@ def gen_key(pamh, user, length):
         action_tg(content)
     if Config.open_dingding:
         action_dingding(content)
+    if Config.open_wechat:
+        action_wechat(content)
 
     pin_time = datetime.datetime.now()
     return get_hash(pin), pin_time
