@@ -1,5 +1,7 @@
 # 2sa_pam
+Linux SSH 二次身份验证 两步验证 Two-Step Authentication(2SA) Pam模块
 
+## 简介
 为centos系统加上pam两次验证，对接第三方通知(钉钉、企业微信、tg)
 
 ![](./img/1.png)
@@ -8,7 +10,7 @@
 
 日志在`/var/log/messages`下面
 
-## 配置
+## 使用配置
 
 安装前先修改配置 ，在`pam_notice_auth.py`文件的`Config`类修改。
 
