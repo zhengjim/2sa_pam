@@ -55,5 +55,5 @@ chmod +x pam_uninstall_shell.sh
 
 [![Top Langs](https://profile-counter.glitch.me/zhengjim/count.svg)](https://www.zhengjim.com)
 
-[![Stargazers over time](https://starchart.cc/zhengjim/camille.svg)](https://starchart.cc/zhengjim/2sa_pam)
+[![Stargazers over time](https://starchart.cc/zhengjim/2sa_pam.svg)](https://starchart.cc/zhengjim/2sa_pam)
 
