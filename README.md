@@ -50,3 +50,10 @@ chmod +x ./pam_install_shell.sh
 chmod +x pam_uninstall_shell.sh
 ./pam_uninstall_shell.sh
 ```
+
+## Stargazers over time
+
+[![Top Langs](https://profile-counter.glitch.me/zhengjim/count.svg)](https://www.zhengjim.com)
+
+[![Stargazers over time](https://starchart.cc/zhengjim/camille.svg)](https://starchart.cc/zhengjim/2sa_pam)
+
