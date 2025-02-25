@@ -16,7 +16,7 @@ import socket
 
 class Config:
     """ 配置 """
-    EMERGENCY_HASH = "admin"  # 预定义万能验证码,务必修改！
+    EMERGENCY_HASH = "admin"  # 预定义万能验证码,务必修改！！！
     PIN_LENGTH = 6  # PIN码长度
     PIN_LIVE = 60  # PIN存活时间,超出时间验证失败
     PIN_LIMIT = 3  # 限制错误尝试次数
